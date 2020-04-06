@@ -23,7 +23,7 @@ def output_command(command):
     return result
 
 def other_command(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         user_says = " ".join(context.args)
         update.message.reply_text(output_command(user_says))
@@ -31,7 +31,7 @@ def other_command(update, context):
         update.message.reply_text('You are not my owner')
 
 def check_all_service_running(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         command = """netstat -lntp | awk '{split($7,a,"/"); split(a[2],b,":"); print(b[1])}' | sort | uniq"""
         if not check_is_root:
@@ -43,7 +43,7 @@ def check_all_service_running(update, context):
         update.message.reply_text('You are not my owner')
 
 def check_all_port_opening(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         command = """netstat -lntp | awk '$4 ~ /:/ {print$4}' | sort | uniq"""
         if not check_is_root:
@@ -55,7 +55,7 @@ def check_all_port_opening(update, context):
         update.message.reply_text('You are not my owner')
 
 def restart_service(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         service = " ".join(context.args)
         command = "service restart " + service
@@ -68,7 +68,7 @@ def restart_service(update, context):
         update.message.reply_text('You are not my owner')
 
 def start_service(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         service = " ".join(context.args)
         command = "service start " + service
@@ -81,7 +81,7 @@ def start_service(update, context):
         update.message.reply_text('You are not my owner')
 
 def stop_service(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         service = " ".join(context.args)
         command = "service stop " + service
@@ -94,7 +94,7 @@ def stop_service(update, context):
         update.message.reply_text('You are not my owner')
 
 def status_service(update, context):
-    owner = update.message.from_user.id
+    owner = str(update.message.from_user.id)
     if owner == get_owner():
         service = " ".join(context.args)
         command = "service status " + service
