@@ -34,7 +34,7 @@ def check_all_service_running(update, context):
     owner = update.message.from_user.id
     if owner == get_owner:
         command = """netstat -lntp | awk '{split($7,a,"/"); split(a[2],b,":"); print(b[1])}' | sort | uniq"""
-        if check_is_root == False:
+        if not check_is_root:
             command = "sudo " + command
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
@@ -46,7 +46,7 @@ def check_all_port_opening(update, context):
     owner = update.message.from_user.id
     if owner == get_owner:
         command = """netstat -lntp | awk '$4 ~ /:/ {print$4}' | sort | uniq"""
-        if check_is_root == False:
+        if not check_is_root:
             command = "sudo " + command
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
@@ -59,7 +59,7 @@ def restart_service(update, context):
     if owner == get_owner:
         service = " ".join(context.args)
         command = "service restart " + service
-        if check_is_root == False:
+        if not check_is_root:
             command = "sudo " + command
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
@@ -72,7 +72,7 @@ def start_service(update, context):
     if owner == get_owner:
         service = " ".join(context.args)
         command = "service start " + service
-        if check_is_root == False:
+        if not check_is_root:
             command = "sudo " + command
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
@@ -85,7 +85,7 @@ def stop_service(update, context):
     if owner == get_owner:
         service = " ".join(context.args)
         command = "service stop " + service
-        if check_is_root == False:
+        if not check_is_root:
             command = "sudo " + command
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
@@ -98,7 +98,7 @@ def status_service(update, context):
     if owner == get_owner:
         service = " ".join(context.args)
         command = "service status " + service
-        if check_is_root == False:
+        if not check_is_root:
             command = "sudo " + command
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
