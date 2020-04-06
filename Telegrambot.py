@@ -24,7 +24,7 @@ def output_command(command):
 
 def other_command(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         user_says = " ".join(context.args)
         update.message.reply_text(output_command(user_says))
     else:
@@ -32,7 +32,7 @@ def other_command(update, context):
 
 def check_all_service_running(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         command = """netstat -lntp | awk '{split($7,a,"/"); split(a[2],b,":"); print(b[1])}' | sort | uniq"""
         if not check_is_root:
             command = "sudo " + command
@@ -44,7 +44,7 @@ def check_all_service_running(update, context):
 
 def check_all_port_opening(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         command = """netstat -lntp | awk '$4 ~ /:/ {print$4}' | sort | uniq"""
         if not check_is_root:
             command = "sudo " + command
@@ -56,7 +56,7 @@ def check_all_port_opening(update, context):
 
 def restart_service(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         service = " ".join(context.args)
         command = "service restart " + service
         if not check_is_root:
@@ -69,7 +69,7 @@ def restart_service(update, context):
 
 def start_service(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         service = " ".join(context.args)
         command = "service start " + service
         if not check_is_root:
@@ -82,7 +82,7 @@ def start_service(update, context):
 
 def stop_service(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         service = " ".join(context.args)
         command = "service stop " + service
         if not check_is_root:
@@ -95,7 +95,7 @@ def stop_service(update, context):
 
 def status_service(update, context):
     owner = update.message.from_user.id
-    if owner == get_owner:
+    if owner == get_owner():
         service = " ".join(context.args)
         command = "service status " + service
         if not check_is_root:
@@ -106,11 +106,8 @@ def status_service(update, context):
     else:
         update.message.reply_text('You are not my owner')
 
-def authentication_bot(token):
-    return Updater(token, use_context=True)
-
 def main():
-    updater = authentication_bot(get_token_bot)
+    updater = Updater(get_token_bot(), use_context=True)
     updater.dispatcher.add_handler(CommandHandler("run", other_command))
     updater.dispatcher.add_handler(CommandHandler("service_running",check_all_service_running))
     updater.dispatcher.add_handler(CommandHandler("port_opening",check_all_port_opening))
