@@ -1,6 +1,15 @@
 import subprocess
 from telegram.ext import Updater, CommandHandler
+import json
 
+def get_owner():
+    with open('Authentication.json') as Authen:
+        read_data = json.load(Authen)
+    return read_data["ID_Owner"]
+def get_token_bot():
+    with open('Authentication.json') as Authen:
+        read_data = json.load(Authen)
+    return read_data["Token_TelegramBot"]
 def check_is_root():
     check_root = "whoami"
     if output_command(check_root) == "root":
@@ -15,7 +24,7 @@ def output_command(command):
 
 def other_command(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         user_says = " ".join(context.args)
         update.message.reply_text(output_command(user_says))
     else:
@@ -23,7 +32,7 @@ def other_command(update, context):
 
 def check_all_service_running(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         command = """netstat -lntp | awk '{split($7,a,"/"); split(a[2],b,":"); print(b[1])}' | sort | uniq"""
         if check_is_root == False:
             command = "sudo " + command
@@ -35,7 +44,7 @@ def check_all_service_running(update, context):
 
 def check_all_port_opening(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         command = """netstat -lntp | awk '$4 ~ /:/ {print$4}' | sort | uniq"""
         if check_is_root == False:
             command = "sudo " + command
@@ -47,7 +56,7 @@ def check_all_port_opening(update, context):
 
 def restart_service(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         service = " ".join(context.args)
         command = "service restart " + service
         if check_is_root == False:
@@ -60,7 +69,7 @@ def restart_service(update, context):
 
 def start_service(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         service = " ".join(context.args)
         command = "service start " + service
         if check_is_root == False:
@@ -73,7 +82,7 @@ def start_service(update, context):
 
 def stop_service(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         service = " ".join(context.args)
         command = "service stop " + service
         if check_is_root == False:
@@ -86,7 +95,7 @@ def stop_service(update, context):
 
 def status_service(update, context):
     owner = update.message.from_user.id
-    if owner == 817269876:
+    if owner == get_owner:
         service = " ".join(context.args)
         command = "service status " + service
         if check_is_root == False:
@@ -101,7 +110,7 @@ def authentication_bot(token):
     return Updater(token, use_context=True)
 
 def main():
-    updater = authentication_bot("1111280886:AAFhKDDyRxIOGuBvogpedMuoEM7t8kWiLhI")
+    updater = authentication_bot(get_token_bot)
     updater.dispatcher.add_handler(CommandHandler("run", other_command))
     updater.dispatcher.add_handler(CommandHandler("service_running",check_all_service_running))
     updater.dispatcher.add_handler(CommandHandler("port_opening",check_all_port_opening))
