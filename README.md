@@ -14,7 +14,7 @@ To see status service: /status_service + service_name
 
 To check ports are openning: /port_opening
 
-To check service are running: /check_all_service_running
+To check service are running: /service_running
 
 To check memory: /check_mem
 
