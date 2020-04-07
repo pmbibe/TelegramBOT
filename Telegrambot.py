@@ -64,7 +64,7 @@ def restart_service(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
         service = " ".join(context.args)
-        command = "service restart " + service
+        command = "service " + service + " restart"
         if not check_is_root:
             command = "sudo " + command
         update.message.reply_text(output_command(command))
@@ -157,6 +157,23 @@ def check_disk_usage(update, context):
     else:
         update.message.reply_text('You are not my owner')
 
+def help(update, context):
+    owner = str(update.message.from_user.id)
+    if owner == get_owner():
+        help = "To start service: /start_service + service_name \n" \
+               "To stop service: /stop_service + service_name \n" \
+               "To restart service: /restart_service + service_name \n" \
+               "To see status service: /status_service + service_name \n" \
+               "To check ports are openning: /port_opening \n" \
+               "To check service are running: /service_running \n" \
+               "To check memory: /check_mem \n" \
+               "To check load cpu: /check_load_cpu \n" \
+               "To check disk usage: /check_disk_usage"
+        update.message.reply_text(help)
+    else:
+        update.message.reply_text('You are not my owner')
+
+
 def main():
     updater = Updater(get_token_bot(), use_context=True)
     updater.dispatcher.add_handler(CommandHandler("run", other_command))
@@ -169,6 +186,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler("check_mem", check_mem))
     updater.dispatcher.add_handler(CommandHandler("check_load_cpu", check_load_cpu))
     updater.dispatcher.add_handler(CommandHandler("check_disk_usage", check_disk_usage))
+    updater.dispatcher.add_handler(CommandHandler("help", help))
     updater.start_polling()
     updater.idle()
 
