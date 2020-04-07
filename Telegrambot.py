@@ -26,7 +26,6 @@ def check_is_root():
 def output_command(command):
     result = subprocess.check_output(command, shell=True)
     result = result.decode("utf-8")
-    print(result)
     return result
 
 
@@ -127,11 +126,36 @@ def check_mem(update, context):
         mem_used_rate = float("{:.4f}".format(mem_used_rate)) * 100
         result = "Total: " + str(mem_total) + "GB \n" + "Free: " + str(mem_free) + 'GB \n' + "Avaiable: " + str(
             mem_available) + "GB \n" + "Used Rate: " + str(mem_used_rate) + "%"
-        print(result)
         update.message.reply_text(result)
     else:
         update.message.reply_text('You are not my owner')
 
+
+def check_load_cpu(update, context):
+    owner = str(update.message.from_user.id)
+    if owner == get_owner():
+        command = """cat /proc/loadavg | awk '{print $1}'"""
+        if not check_is_root:
+            command = "sudo " + command
+        update.message.reply_text("CPU Load: {}/{} ".format(output_command(command).split("\n")[0],output_command("grep -c ^processor /proc/cpuinfo")))
+    else:
+        update.message.reply_text('You are not my owner')
+
+def check_disk_usage(update, context):
+    owner = str(update.message.from_user.id)
+    if owner == get_owner():
+        command = """df | awk 'NR > 1 {print $6,$5, $4}'"""
+        if not check_is_root:
+            command = "sudo " + command
+        result = subprocess.check_output(command, shell=True)
+        result = result.decode("utf-8")
+        d = result.count('\n')
+        for i in range(d):
+            line = result.split("\n")[i]
+            a = line.split()
+            update.message.reply_text("Location: {} \nUsed: {} \nAvailable: {}".format(a[0], a[1], a[2]))
+    else:
+        update.message.reply_text('You are not my owner')
 
 def main():
     updater = Updater(get_token_bot(), use_context=True)
@@ -143,6 +167,8 @@ def main():
     updater.dispatcher.add_handler(CommandHandler("stop_service", stop_service))
     updater.dispatcher.add_handler(CommandHandler("status_service", status_service))
     updater.dispatcher.add_handler(CommandHandler("check_mem", check_mem))
+    updater.dispatcher.add_handler(CommandHandler("check_load_cpu", check_load_cpu))
+    updater.dispatcher.add_handler(CommandHandler("check_disk_usage", check_disk_usage))
     updater.start_polling()
     updater.idle()
 
