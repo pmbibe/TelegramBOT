@@ -47,12 +47,10 @@ def check_mem(update, context):
         command = """cat /proc/meminfo | awk '$1 ~ /Mem/ {print $2/1024/1024}'"""
         if not check_is_root:
             command = "sudo " + command
-        try:
+        if context.args:
             command = ssh_to_server(context.args[0]) + " " + command
-        except IndexError:
-            pass
-        if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
-            update.message.reply_text('Check your host or IP address')
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
         mem_total = float(result.split("\n")[0])
@@ -68,6 +66,43 @@ def check_mem(update, context):
         update.message.reply_text(result)
     else:
         update.message.reply_text('You are not my owner')
+
+def check_load_cpu(update, context):
+    owner = str(update.message.from_user.id)
+    if owner == get_owner():
+        command = """cat /proc/loadavg | awk '{print $1}'"""
+        if not check_is_root:
+            command = "sudo " + command
+        if context.args:
+            command = ssh_to_server(context.args[0]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        update.message.reply_text("CPU Load: {}/{} ".format(output_command(command).split("\n")[0],
+                                                            output_command("grep -c ^processor /proc/cpuinfo")))
+    else:
+        update.message.reply_text('You are not my owner')
+
+
+def check_disk_usage(update, context):
+    owner = str(update.message.from_user.id)
+    if owner == get_owner():
+        command = """df | awk 'NR > 1 {print $6,$5, $4}'"""
+        if not check_is_root:
+            command = "sudo " + command
+        if context.args:
+            command = ssh_to_server(context.args[0]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        result = subprocess.check_output(command, shell=True)
+        result = result.decode("utf-8")
+        d = result.count('\n')
+        for i in range(d):
+            line = result.split("\n")[i]
+            a = line.split()
+            update.message.reply_text("Location: {} \nUsed: {} \nAvailable: {}".format(a[0], a[1], a[2]))
+    else:
+        update.message.reply_text('You are not my owner')
+
 
 
 def main():
