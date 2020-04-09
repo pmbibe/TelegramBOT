@@ -1,6 +1,7 @@
 import subprocess
 from telegram.ext import Updater, CommandHandler
 import json
+import re
 
 
 def output_command(command):
@@ -15,9 +16,11 @@ def check_is_success(command):
         return True
     return False
 
+
 def ssh_to_server(server):
     command = "ssh root@" + server
     return command
+
 
 def get_owner():
     with open('Authentication.json') as Authen:
@@ -39,13 +42,18 @@ def check_is_root():
         return False
 
 
-
-
 def other_command(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        user_says = " ".join(context.args)
-        update.message.reply_text(output_command(user_says))
+        if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',context.args[0]):
+            for i in range(1, len(context.args)):
+                command = " ".join(context.args[i])
+            command = ssh_to_server(context.args[0]) + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        else:
+            command = " ".join(context.args)
+        update.message.reply_text(output_command(command))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -60,10 +68,7 @@ def check_all_service_running(update, context):
             command = ssh_to_server(context.args[0]) + " " + command
             if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
                 update.message.reply_text('Check your host or IP address')
-            else:
-                update.message.reply_text("Services are running: {} ".format(output_command(command)))
-        else:
-            update.message.reply_text("Services are running: {} ".format(output_command(command)))
+        update.message.reply_text("Services are running: {} ".format(output_command(command)))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -74,6 +79,10 @@ def check_all_port_opening(update, context):
         command = """netstat -lntp | awk '$4 ~ /:/ {print$4}' | sort | uniq"""
         if not check_is_root:
             command = "sudo " + command
+        if context.args:
+            command = ssh_to_server(context.args[0]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
         update.message.reply_text("Ports are opening: {} ".format(output_command(command)))
     else:
         update.message.reply_text('You are not my owner')
@@ -82,11 +91,18 @@ def check_all_port_opening(update, context):
 def restart_service(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        service = " ".join(context.args)
+        service = context.args[0]
         command = "service " + service + " restart"
         if not check_is_root:
             command = "sudo " + command
-        update.message.reply_text(output_command(command))
+        try:
+            command = ssh_to_server(context.args[1]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        except IndexError:
+            pass
+        if check_is_success(command):
+            update.message.reply_text("Service {} has been restarted".format(service))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -94,11 +110,18 @@ def restart_service(update, context):
 def start_service(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        service = " ".join(context.args)
+        service = context.args[0]
         command = "service " + service + " start"
         if not check_is_root:
             command = "sudo " + command
-        update.message.reply_text(output_command(command))
+        try:
+            command = ssh_to_server(context.args[1]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        except IndexError:
+            pass
+        if check_is_success(command):
+            update.message.reply_text("Service {} has been started".format(service))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -106,11 +129,18 @@ def start_service(update, context):
 def stop_service(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        service = " ".join(context.args)
+        service = context.args[0]
         command = "service " + service + " stop"
         if not check_is_root:
             command = "sudo " + command
-        update.message.reply_text(output_command(command))
+        try:
+            command = ssh_to_server(context.args[1]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        except IndexError:
+            pass
+        if check_is_success(command):
+            update.message.reply_text("Service {} has been stoped".format(service))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -118,11 +148,18 @@ def stop_service(update, context):
 def status_service(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        service = " ".join(context.args)
+        service = context.args[0]
         command = "service " + service + " status"
         if not check_is_root:
             command = "sudo " + command
-        update.message.reply_text(output_command(command))
+        try:
+            command = ssh_to_server(context.args[1]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        except IndexError:
+            pass
+        if check_is_success(command):
+            update.message.reply_text(output_command(command))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -133,6 +170,10 @@ def check_mem(update, context):
         command = """cat /proc/meminfo | awk '$1 ~ /Mem/ {print $2/1024/1024}'"""
         if not check_is_root:
             command = "sudo " + command
+        if context.args:
+            command = ssh_to_server(context.args[0]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
         mem_total = float(result.split("\n")[0])
@@ -156,9 +197,15 @@ def check_load_cpu(update, context):
         command = """cat /proc/loadavg | awk '{print $1}'"""
         if not check_is_root:
             command = "sudo " + command
-        update.message.reply_text("CPU Load: {}/{} ".format(output_command(command).split("\n")[0],output_command("grep -c ^processor /proc/cpuinfo")))
+        if context.args:
+            command = ssh_to_server(context.args[0]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
+        update.message.reply_text("CPU Load: {}/{} ".format(output_command(command).split("\n")[0],
+                                                            output_command("grep -c ^processor /proc/cpuinfo")))
     else:
         update.message.reply_text('You are not my owner')
+
 
 def check_disk_usage(update, context):
     owner = str(update.message.from_user.id)
@@ -166,6 +213,10 @@ def check_disk_usage(update, context):
         command = """df | awk 'NR > 1 {print $6,$5, $4}'"""
         if not check_is_root:
             command = "sudo " + command
+        if context.args:
+            command = ssh_to_server(context.args[0]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
         result = subprocess.check_output(command, shell=True)
         result = result.decode("utf-8")
         d = result.count('\n')
@@ -175,6 +226,7 @@ def check_disk_usage(update, context):
             update.message.reply_text("Location: {} \nUsed: {} \nAvailable: {}".format(a[0], a[1], a[2]))
     else:
         update.message.reply_text('You are not my owner')
+
 
 def help(update, context):
     owner = str(update.message.from_user.id)
@@ -208,6 +260,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler("help", help))
     updater.start_polling()
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
