@@ -56,8 +56,8 @@ def restart_service(update, context):
                     update.message.reply_text(output_command(command))
             else:
                 update.message.reply_text(output_command(command))
-        update.message.reply_text(output_command(command))
-        print(check_is_success(ssh_to_server(context.args[1])) + " exit" )
+        if check_is_success(command):
+            update.message.reply_text("Service {} has been restarted" .format(service))
     else:
         update.message.reply_text('You are not my owner')
 
