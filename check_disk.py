@@ -44,13 +44,13 @@ def output_command(command):
 def other_command(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        print(context.args[0])
-        if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',context.args[0]):
+        ip = context.args[0]
+        if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',ip):
             l = context.args
             l = l.pop(0)
             command = " ".join(l)
-            command = ssh_to_server(context.args[0]) + " " +command
-            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+            command = ssh_to_server(ip) + " " +command
+            if not check_is_success(ssh_to_server(ip) + " exit"):
                 update.message.reply_text('Check your host or IP address')
         else:
             command = " ".join(context.args)
