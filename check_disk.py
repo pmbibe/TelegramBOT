@@ -46,15 +46,15 @@ def other_command(update, context):
     if owner == get_owner():
         ip = context.args[0]
         if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',ip):
-            l = context.args
-            l = l.pop(0)
-            command = " ".join(l)
+
+            command = " ".join(context.args.pop(0))
             command = ssh_to_server(ip) + " " +command
             if not check_is_success(ssh_to_server(ip) + " exit"):
                 update.message.reply_text('Check your host or IP address')
         else:
             command = " ".join(context.args)
         print(command)
+        print(context.args.pop(0))
         update.message.reply_text(output_command(command))
     else:
         update.message.reply_text('You are not my owner')
