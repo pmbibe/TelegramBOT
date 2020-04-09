@@ -56,6 +56,7 @@ def check_all_service_running(update, context):
                 #                update.message.reply_text("Services are running: {} ".format(output_command(command)))
                 print("2")
             print(check_is_success(command))
+            print(command)
         else:
             update.message.reply_text("Services are running: {} ".format(output_command(command)))
     else:
