@@ -8,6 +8,7 @@ def get_token_bot():
         read_data = json.load(Authen)
     return read_data["Token_TelegramBot"]
 
+
 def check_is_success(command):
     return_code = subprocess.call(command, shell=True)
     if return_code == 0:
@@ -20,9 +21,11 @@ def get_owner():
         read_data = json.load(Authen)
     return read_data["ID_Owner"]
 
+
 def ssh_to_server(server):
     command = "ssh root@" + server
     return command
+
 
 def check_is_root():
     check_root = "whoami"
@@ -31,10 +34,12 @@ def check_is_root():
     else:
         return False
 
+
 def output_command(command):
     result = subprocess.check_output(command, shell=True)
     result = result.decode("utf-8")
     return result
+
 
 def check_all_service_running(update, context):
     owner = str(update.message.from_user.id)
@@ -45,20 +50,25 @@ def check_all_service_running(update, context):
         if context.args:
             command = ssh_to_server(context.args[0]) + " " + command
             if not check_is_success(command):
-                update.message.reply_text('Check your host or IP address')
+                #                update.message.reply_text('Check your host or IP address')
+                print("1")
             else:
-                update.message.reply_text("Services are running: {} ".format(output_command(command)))
+                #                update.message.reply_text("Services are running: {} ".format(output_command(command)))
+                print("2")
+            print(check_is_success(command))
         else:
             update.message.reply_text("Services are running: {} ".format(output_command(command)))
     else:
         update.message.reply_text('You are not my owner')
-        
+
+
 def main():
     updater = Updater(get_token_bot(), use_context=True)
     updater.dispatcher.add_handler(CommandHandler("service_running", check_all_service_running))
 
     updater.start_polling()
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
