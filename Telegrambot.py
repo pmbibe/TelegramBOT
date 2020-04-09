@@ -11,7 +11,7 @@ def output_command(command):
 
 def check_is_success(command):
     return_code = subprocess.call(command, shell=True)
-    if return_code.split("\n")[0] == "0":
+    if return_code.split == 0:
         return True
     return False
 
@@ -58,7 +58,7 @@ def check_all_service_running(update, context):
             command = "sudo " + command
         if context.args:
             command = ssh_to_server(context.args[0]) + " " + command
-            if not check_is_success(command):
+            if check_is_success(command) == False:
                 update.message.reply_text('Check your host or IP address')
             else:
                 update.message.reply_text("Services are running: {} ".format(output_command(command)))
