@@ -49,20 +49,14 @@ def restart_service(update, context):
         if not check_is_root:
             command = "sudo " + command
         try:
-            print(context.args[1])
+            command = ssh_to_server(context.args[1]) + " " + command
+            if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+                update.message.reply_text('Check your host or IP address')
         except IndexError:
-            print("2")
-    #               command = ssh_to_server(context.args[1]) + " " + command
-    #               if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
-    #                   print("1")
-    #               else:
-    #                   print("2")
-    #       command = ssh_to_server(context.args[1]) + " " + command
-    print(command)
-
-
-#    if check_is_success(command):
-#        update.message.reply_text("Service {} has been restarted".format(service))
+            if check_is_success(command):
+                update.message.reply_text("Service {} has been restarted".format(service))
+    if check_is_success(command):
+        update.message.reply_text("Service {} has been restarted".format(service))
 
 def main():
     updater = Updater(get_token_bot(), use_context=True)
