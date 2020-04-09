@@ -41,65 +41,18 @@ def output_command(command):
     return result
 
 
-def check_mem(update, context):
+def other_command(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        command = """cat /proc/meminfo | awk '$1 ~ /Mem/ {print $2/1024/1024}'"""
-        if not check_is_root:
-            command = "sudo " + command
-        if context.args:
-            command = ssh_to_server(context.args[0]) + " " + command
+        if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',context.args[0]):
+            for i in range(1, len(context.args)):
+                command = " ".join(context.args[i])
+            command = ssh_to_server(context.args[0]) + command
             if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
                 update.message.reply_text('Check your host or IP address')
-        result = subprocess.check_output(command, shell=True)
-        result = result.decode("utf-8")
-        mem_total = float(result.split("\n")[0])
-        mem_free = float(result.split("\n")[1])
-        mem_available = float(result.split("\n")[2])
-        mem_used_rate = 1 - mem_free / mem_total
-        mem_total = float("{:.2f}".format(mem_total))
-        mem_free = float("{:.2f}".format(mem_free))
-        mem_available = float("{:.2f}".format(mem_available))
-        mem_used_rate = float("{:.4f}".format(mem_used_rate)) * 100
-        result = "Total: " + str(mem_total) + "GB \n" + "Free: " + str(mem_free) + 'GB \n' + "Avaiable: " + str(
-            mem_available) + "GB \n" + "Used Rate: " + str(mem_used_rate) + "%"
-        update.message.reply_text(result)
-    else:
-        update.message.reply_text('You are not my owner')
-
-def check_load_cpu(update, context):
-    owner = str(update.message.from_user.id)
-    if owner == get_owner():
-        command = """cat /proc/loadavg | awk '{print $1}'"""
-        if not check_is_root:
-            command = "sudo " + command
-        if context.args:
-            command = ssh_to_server(context.args[0]) + " " + command
-            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
-                update.message.reply_text('Check your host or IP address')
-        update.message.reply_text("CPU Load: {}/{} ".format(output_command(command).split("\n")[0],
-                                                            output_command("grep -c ^processor /proc/cpuinfo")))
-    else:
-        update.message.reply_text('You are not my owner')
-
-
-def check_disk_usage(update, context):
-    owner = str(update.message.from_user.id)
-    if owner == get_owner():
-        command = """df | awk 'NR > 1 {print $6,$5, $4}'"""
-        if not check_is_root:
-            command = "sudo " + command
-        if context.args:
-            command = ssh_to_server(context.args[0]) + " " + command
-            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
-                update.message.reply_text('Check your host or IP address')
-        result = subprocess.check_output(command, shell=True)
-        result = result.decode("utf-8")
-        d = result.count('\n')
-        for i in range(d):
-            line = result.split("\n")[i]
-            a = line.split()
-            update.message.reply_text("Location: {} \nUsed: {} \nAvailable: {}".format(a[0], a[1], a[2]))
+        else:
+            command = " ".join(context.args)
+        update.message.reply_text(output_command(command))
     else:
         update.message.reply_text('You are not my owner')
 
@@ -108,7 +61,7 @@ def check_disk_usage(update, context):
 def main():
     updater = Updater(get_token_bot(), use_context=True)
 
-    updater.dispatcher.add_handler(CommandHandler("check_mem", check_mem))
+    updater.dispatcher.add_handler(CommandHandler("run", other_command))
 
     updater.start_polling()
     updater.idle()
