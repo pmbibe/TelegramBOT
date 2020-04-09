@@ -48,8 +48,11 @@ def check_all_service_running(update, context):
         if not check_is_root:
             command = "sudo " + command
         if context.args:
-            command = ssh_to_server(context.args[0]) + command
-        update.message.reply_text("Services are running: {} ".format(output_command(command)))
+            command = ssh_to_server(context.args[0]) + " " + command
+        if "Name or service not known" in output_command(ssh_to_server(context.args[0])):
+            update.message.reply_text('Check your host or IP address')
+        else:
+            update.message.reply_text("Services are running: {} ".format(output_command(command)))
     else:
         update.message.reply_text('You are not my owner')
 
