@@ -55,6 +55,7 @@ def restart_service(update, context):
 
     print(command)
     print(context.args[1])
+    print(check_is_success(ssh_to_server(context.args[1]) + " exit"))
     if check_is_success(command):
         update.message.reply_text("Service {} has been restarted".format(service))
 
