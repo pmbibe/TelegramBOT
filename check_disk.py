@@ -54,6 +54,7 @@ def restart_service(update, context):
                     update.message.reply_text('Check your host or IP address')
 
     print(command)
+    print(context.args[1])
     if check_is_success(command):
         update.message.reply_text("Service {} has been restarted".format(service))
 
