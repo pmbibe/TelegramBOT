@@ -2,6 +2,19 @@ import subprocess
 from telegram.ext import Updater, CommandHandler
 import json
 
+
+def output_command(command):
+    result = subprocess.check_output(command, shell=True)
+    result = result.decode("utf-8")
+    return result
+
+
+def check_is_success(command):
+    return_code = subprocess.call(command, shell=True)
+    if return_code == 0:
+        return True
+    return False
+
 def ssh_to_server(server):
     command = "ssh root@" + server
     return command
@@ -26,10 +39,6 @@ def check_is_root():
         return False
 
 
-def output_command(command):
-    result = subprocess.check_output(command, shell=True)
-    result = result.decode("utf-8")
-    return result
 
 
 def other_command(update, context):
@@ -49,7 +58,7 @@ def check_all_service_running(update, context):
             command = "sudo " + command
         if context.args:
             command = ssh_to_server(context.args[0]) + " " + command
-            if "Name or service not known" in output_command(ssh_to_server(context.args[0])):
+            if not check_is_success(command):
                 update.message.reply_text('Check your host or IP address')
             else:
                 update.message.reply_text("Services are running: {} ".format(output_command(command)))
