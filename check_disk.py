@@ -49,7 +49,7 @@ def check_mem(update, context):
             command = "sudo " + command
         try:
             command = ssh_to_server(context.args[0]) + " " + command
-        except NameError:
+        except IndexError:
             pass
         if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
             update.message.reply_text('Check your host or IP address')
