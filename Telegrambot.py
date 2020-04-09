@@ -11,7 +11,7 @@ def output_command(command):
 
 def check_is_success(command):
     return_code = subprocess.call(command, shell=True)
-    if return_code.split == 0:
+    if return_code == 0:
         return True
     return False
 
