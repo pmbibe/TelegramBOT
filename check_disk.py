@@ -53,10 +53,10 @@ def restart_service(update, context):
             if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
                 update.message.reply_text('Check your host or IP address')
         except IndexError:
-            if check_is_success(command):
-                update.message.reply_text("Service {} has been restarted".format(service))
+            pass
     if check_is_success(command):
         update.message.reply_text("Service {} has been restarted".format(service))
+
 
 def main():
     updater = Updater(get_token_bot(), use_context=True)
