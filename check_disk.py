@@ -52,12 +52,11 @@ def restart_service(update, context):
                 command = ssh_to_server(context.args[1]) + " " + command
                 if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
                     update.message.reply_text('Check your host or IP address')
-                else:
-                    if check_is_success(command):
-                        update.message.reply_text("Service {} has been restarted".format(service))
-            else:
-                if check_is_success(command):
-                    update.message.reply_text("Service {} has been restarted".format(service))
+
+    print(command)
+    if check_is_success(command):
+        update.message.reply_text("Service {} has been restarted".format(service))
+
 
     else:
         update.message.reply_text('You are not my owner')
