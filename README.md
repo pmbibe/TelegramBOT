@@ -21,3 +21,5 @@ To check memory: /check_mem + [IP]
 To check load cpu: /check_load_cpu + [IP]
 
 To check disk usage: /check_disk_usage + [IP]
+
+To use other command: /run + [IP] + command
