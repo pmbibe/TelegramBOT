@@ -48,7 +48,7 @@ def restart_service(update, context):
         command = "service " + service + " restart"
         if not check_is_root:
             command = "sudo " + command
-        if context.args[1] is not None:
+        if context.args[1]:
             print("1")
         else:
              print("2")
@@ -59,11 +59,7 @@ def restart_service(update, context):
     #                   print("2")
     #       command = ssh_to_server(context.args[1]) + " " + command
     print(command)
-    print(type(context.args[1]))
-    print(context.args[1])
-    print(check_is_success(ssh_to_server(context.args[1]) + " exit"))
-
-
+    print(context.args)
 #    if check_is_success(command):
 #        update.message.reply_text("Service {} has been restarted".format(service))
 
