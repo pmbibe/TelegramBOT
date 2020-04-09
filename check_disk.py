@@ -48,23 +48,21 @@ def restart_service(update, context):
         command = "service " + service + " restart"
         if not check_is_root:
             command = "sudo " + command
-            if context.args[1]:
-                command = ssh_to_server(context.args[1]) + " " + command
-                if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
-                    print("1")
-                else:
-                    print("2")
+    #           if context.args[1] is not None:
+    #               command = ssh_to_server(context.args[1]) + " " + command
+    #               if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+    #                   print("1")
+    #               else:
+    #                   print("2")
+    #       command = ssh_to_server(context.args[1]) + " " + command
     print(command)
+    print(type(context.args[1]))
     print(context.args[1])
     print(check_is_success(ssh_to_server(context.args[1]) + " exit"))
+
+
 #    if check_is_success(command):
 #        update.message.reply_text("Service {} has been restarted".format(service))
-
-
-    else:
-        update.message.reply_text('You are not my owner')
-
-
 
 def main():
     updater = Updater(get_token_bot(), use_context=True)
