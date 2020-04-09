@@ -49,7 +49,7 @@ def check_all_service_running(update, context):
             command = "sudo " + command
         if context.args:
             command = ssh_to_server(context.args[0]) + " " + command
-            if not check_is_success(command):
+            if not check_is_success(ssh_to_server(context.args[0])):
                 #                update.message.reply_text('Check your host or IP address')
                 print("1")
             else:
