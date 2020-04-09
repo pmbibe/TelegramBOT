@@ -69,11 +69,13 @@ def check_mem(update, context):
     else:
         update.message.reply_text('You are not my owner')
 
+
 def main():
     updater = Updater(get_token_bot(), use_context=True)
+
     updater.dispatcher.add_handler(CommandHandler("check_mem", check_mem))
 
-    updater.status_polling()
+    updater.start_polling()
     updater.idle()
 
 
