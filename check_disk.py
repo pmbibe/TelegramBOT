@@ -46,7 +46,8 @@ def other_command(update, context):
     if owner == get_owner():
         ip = context.args[0]
         if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',ip):
-            command = " ".join(context.args.pop(0))
+            context.args.pop(0)
+            command = " ".join(context.args)
             command = ssh_to_server(ip) + " " + command
             print(command)
             if not check_is_success(ssh_to_server(ip) + " exit"):
