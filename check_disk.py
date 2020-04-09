@@ -41,30 +41,29 @@ def output_command(command):
     return result
 
 
-def check_all_service_running(update, context):
+def restart_service(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        command = """netstat -lntp | awk '{split($7,a,"/"); split(a[2],b,":"); print(b[1])}' | sort | uniq"""
+        service = context.args[0]
+        command = "service " + service + " restart"
         if not check_is_root:
             command = "sudo " + command
-        if context.args:
-            command = ssh_to_server(context.args[0]) + " " + command
-            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
-                #                update.message.reply_text('Check your host or IP address')
-                print("1")
+            if context.args[1]:
+                command = ssh_to_server(context.args[1]) + " " + command
+                if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
+                    update.message.reply_text('Check your host or IP address')
+                else:
+                    update.message.reply_text(output_command(command))
             else:
-                #                update.message.reply_text("Services are running: {} ".format(output_command(command)))
-                print("2")
-            print(command)
-        else:
-            update.message.reply_text("Services are running: {} ".format(output_command(command)))
+                update.message.reply_text(output_command(command))
     else:
         update.message.reply_text('You are not my owner')
 
 
+
 def main():
     updater = Updater(get_token_bot(), use_context=True)
-    updater.dispatcher.add_handler(CommandHandler("service_running", check_all_service_running))
+    updater.dispatcher.add_handler(CommandHandler("restart_service", restart_service))
 
     updater.start_polling()
     updater.idle()
