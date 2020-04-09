@@ -245,7 +245,8 @@ def help(update, context):
                "To check service are running: /service_running \n" \
                "To check memory: /check_mem \n" \
                "To check load cpu: /check_load_cpu \n" \
-               "To check disk usage: /check_disk_usage"
+               "To check disk usage: /check_disk_usage \n " \
+               "To use other command: /run + [IP] + command"
         update.message.reply_text(help)
     else:
         update.message.reply_text('You are not my owner')
