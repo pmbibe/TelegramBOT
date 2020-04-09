@@ -51,13 +51,14 @@ def restart_service(update, context):
             if context.args[1]:
                 command = ssh_to_server(context.args[1]) + " " + command
                 if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
-                    update.message.reply_text('Check your host or IP address')
-
+                    print("1")
+                else:
+                    print("2")
     print(command)
     print(context.args[1])
     print(check_is_success(ssh_to_server(context.args[1]) + " exit"))
-    if check_is_success(command):
-        update.message.reply_text("Service {} has been restarted".format(service))
+#    if check_is_success(command):
+#        update.message.reply_text("Service {} has been restarted".format(service))
 
 
     else:
