@@ -45,17 +45,23 @@ def check_is_root():
 def other_command(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',context.args[0]):
-            for i in range(1, len(context.args)):
-                command = " ".join(context.args[i])
-            command = ssh_to_server(context.args[0]) + command
-            if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+        ip = context.args[0]
+        if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',ip):
+            context.args.pop(0)
+            command = " ".join(context.args)
+            command = ssh_to_server(ip) + " " + command
+            print(command)
+            if not check_is_success(ssh_to_server(ip) + " exit"):
                 update.message.reply_text('Check your host or IP address')
         else:
             command = " ".join(context.args)
+        print(command)
+        print(context.args)
+        print(context.args.pop(0))
         update.message.reply_text(output_command(command))
     else:
         update.message.reply_text('You are not my owner')
+
 
 
 def check_all_service_running(update, context):
