@@ -41,28 +41,39 @@ def output_command(command):
     return result
 
 
-def restart_service(update, context):
+def check_mem(update, context):
     owner = str(update.message.from_user.id)
     if owner == get_owner():
-        service = context.args[0]
-        command = "service " + service + " restart"
+        command = """cat /proc/meminfo | awk '$1 ~ /Mem/ {print $2/1024/1024}'"""
         if not check_is_root:
             command = "sudo " + command
         try:
-            command = ssh_to_server(context.args[1]) + " " + command
-            if not check_is_success(ssh_to_server(context.args[1]) + " exit"):
-                update.message.reply_text('Check your host or IP address')
-        except IndexError:
+            command = ssh_to_server(context.args[0]) + " " + command
+        except NameError:
             pass
-    if check_is_success(command):
-        update.message.reply_text("Service {} has been restarted".format(service))
-
+        if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
+            update.message.reply_text('Check your host or IP address')
+        result = subprocess.check_output(command, shell=True)
+        result = result.decode("utf-8")
+        mem_total = float(result.split("\n")[0])
+        mem_free = float(result.split("\n")[1])
+        mem_available = float(result.split("\n")[2])
+        mem_used_rate = 1 - mem_free / mem_total
+        mem_total = float("{:.2f}".format(mem_total))
+        mem_free = float("{:.2f}".format(mem_free))
+        mem_available = float("{:.2f}".format(mem_available))
+        mem_used_rate = float("{:.4f}".format(mem_used_rate)) * 100
+        result = "Total: " + str(mem_total) + "GB \n" + "Free: " + str(mem_free) + 'GB \n' + "Avaiable: " + str(
+            mem_available) + "GB \n" + "Used Rate: " + str(mem_used_rate) + "%"
+        update.message.reply_text(result)
+    else:
+        update.message.reply_text('You are not my owner')
 
 def main():
     updater = Updater(get_token_bot(), use_context=True)
-    updater.dispatcher.add_handler(CommandHandler("restart_service", restart_service))
+    updater.dispatcher.add_handler(CommandHandler("check_mem", check_mem))
 
-    updater.start_polling()
+    updater.status_polling()
     updater.idle()
 
 
