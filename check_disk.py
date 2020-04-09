@@ -48,7 +48,7 @@ def other_command(update, context):
         if re.match('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',context.args[0]):
             for i in range(1, len(context.args)):
                 command = " ".join(context.args[i])
-            command = ssh_to_server(context.args[0]) + command
+            command = ssh_to_server(context.args[0]) + " " +command
             if not check_is_success(ssh_to_server(context.args[0]) + " exit"):
                 update.message.reply_text('Check your host or IP address')
         else:
