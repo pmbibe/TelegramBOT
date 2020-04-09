@@ -2,6 +2,9 @@ import subprocess
 from telegram.ext import Updater, CommandHandler
 import json
 
+def ssh_to_server(server):
+    command = "ssh root@" + server
+    return command
 
 def get_owner():
     with open('Authentication.json') as Authen:
@@ -44,6 +47,8 @@ def check_all_service_running(update, context):
         command = """netstat -lntp | awk '{split($7,a,"/"); split(a[2],b,":"); print(b[1])}' | sort | uniq"""
         if not check_is_root:
             command = "sudo " + command
+        if context.args:
+            command = ssh_to_server(context.args[0]) + command
         update.message.reply_text("Services are running: {} ".format(output_command(command)))
     else:
         update.message.reply_text('You are not my owner')
@@ -190,5 +195,5 @@ def main():
     updater.start_polling()
     updater.idle()
 
-
-main()
+if __name__ == '__main__':
+    main()
